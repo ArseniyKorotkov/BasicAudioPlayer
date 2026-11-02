@@ -3,12 +3,16 @@ package by.arsy.basicaudioplayer
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class AudioViewModel : ViewModel() {
 
@@ -16,6 +20,8 @@ class AudioViewModel : ViewModel() {
 
     private val _isRun = MutableStateFlow(false)
     val isRun = _isRun.asStateFlow()
+    private val _playedTime = MutableStateFlow(0L)
+    val playedTime = _playedTime.asStateFlow()
 
     fun initPlayer(context: Context) {
         if (exoPlayer != null) return
@@ -24,6 +30,7 @@ class AudioViewModel : ViewModel() {
             addListener(object : Player.Listener {
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
                     _isRun.value = isPlaying
+                    updateCurrentPositon()
                 }
 
                 override fun onPlayerError(error: PlaybackException) {
@@ -42,6 +49,17 @@ class AudioViewModel : ViewModel() {
                 prepare()
             }
             play()
+        }
+    }
+
+    private fun updateCurrentPositon() {
+        viewModelScope.launch {
+            while (exoPlayer?.isPlaying == true) {
+                exoPlayer?.currentPosition?.let {
+                    _playedTime.value = it
+                }
+                delay(duration = 500.milliseconds)
+            }
         }
     }
 

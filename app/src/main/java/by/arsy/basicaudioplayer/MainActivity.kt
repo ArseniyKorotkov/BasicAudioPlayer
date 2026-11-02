@@ -46,6 +46,7 @@ fun AudioPlayerExample(
     viewModel: AudioViewModel = viewModel()
 ) {
     val isRun by viewModel.isRun.collectAsState()
+    val playedTime by viewModel.playedTime.collectAsState()
     val activity = LocalActivity.current
 
     DisposableEffect(isRun) {
@@ -77,6 +78,7 @@ fun AudioPlayerExample(
                 fontSize = 42.sp
             )
         }
+        Text(text = "$playedTime")
     }
 
 }
