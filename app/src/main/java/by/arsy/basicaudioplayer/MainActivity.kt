@@ -2,7 +2,9 @@ package by.arsy.basicaudioplayer
 
 import android.content.Context
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
@@ -12,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -43,6 +46,18 @@ fun AudioPlayerExample(
     viewModel: AudioViewModel = viewModel()
 ) {
     val isRun by viewModel.isRun.collectAsState()
+    val activity = LocalActivity.current
+
+    DisposableEffect(isRun) {
+        val window = activity?.window
+        if (isRun) {
+            window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+
+        onDispose {
+            window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
 
     Column(
         modifier = modifier
