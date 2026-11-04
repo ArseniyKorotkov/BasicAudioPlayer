@@ -18,12 +18,9 @@ class AudioViewModel : ViewModel() {
 
     private var exoPlayer: ExoPlayer? = null
 
-    private val _isRun = MutableStateFlow(false)
-    val isRun = _isRun.asStateFlow()
-    private val _playedTime = MutableStateFlow(0L)
-    val playedTime = _playedTime.asStateFlow()
-    private val _trackTime = MutableStateFlow(0L)
-    val trackTime = _trackTime.asStateFlow()
+    private val _audioState = MutableStateFlow(value = AudioState())
+
+    val audioState = _audioState.asStateFlow()
 
     fun initPlayer(context: Context) {
         if (exoPlayer != null) return
@@ -31,7 +28,7 @@ class AudioViewModel : ViewModel() {
         exoPlayer = ExoPlayer.Builder(context).build().apply {
             addListener(object : Player.Listener {
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    _isRun.value = isPlaying
+                    _audioState.value = _audioState.value.copy(isRun = isPlaying)
                     updateCurrentPositon()
                     updateEndPosition()
                 }
@@ -59,7 +56,7 @@ class AudioViewModel : ViewModel() {
         viewModelScope.launch {
             while (exoPlayer?.isPlaying == true) {
                 exoPlayer?.currentPosition?.let {
-                    _playedTime.value = it
+                    _audioState.value = _audioState.value.copy(playedTime = it)
                 }
                 delay(duration = 200.milliseconds)
             }
@@ -67,7 +64,7 @@ class AudioViewModel : ViewModel() {
     }
 
     private fun updateEndPosition() {
-        _trackTime.value = exoPlayer?.duration ?: 0L
+        _audioState.value = _audioState.value.copy(endTime = exoPlayer?.duration ?: 0L)
     }
 
     fun stopAudio() {

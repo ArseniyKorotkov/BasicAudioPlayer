@@ -45,14 +45,12 @@ fun AudioPlayerExample(
     modifier: Modifier = Modifier,
     viewModel: AudioViewModel = viewModel()
 ) {
-    val isRun by viewModel.isRun.collectAsState()
-    val playedTime by viewModel.playedTime.collectAsState()
-    val trackTime by viewModel.trackTime.collectAsState()
+    val audioState by viewModel.audioState.collectAsState()
     val activity = LocalActivity.current
 
-    DisposableEffect(isRun) {
+    DisposableEffect(key1 = audioState.isRun) {
         val window = activity?.window
-        if (isRun) {
+        if (audioState.isRun) {
             window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
 
@@ -67,7 +65,7 @@ fun AudioPlayerExample(
         Button(
             onClick = {
                 viewModel.initPlayer(context = context)
-                if (isRun) {
+                if (audioState.isRun) {
                     viewModel.stopAudio()
                 } else {
                     viewModel.play("https://sefon.pro/api/mp3_download/direct/473774/3vUCACkHO2N_DuccBwV3XXxWD9P2S9kWLSU022fZQMpj1INC31rq8g2K9sqP5Dx62xfZiGLemz3BrdPjwjrp0_jYCvvsHlvmqUOV84DfybNz8sqHe8BGlk1pQmpDtausjk_4W-b14mfzL0NV-NnQmwhP-eVGCt_n_iSrHvU/")
@@ -75,11 +73,11 @@ fun AudioPlayerExample(
             }
         ) {
             Text(
-                text = if (isRun) "||" else ">",
+                text = if (audioState.isRun) "||" else ">",
                 fontSize = 42.sp
             )
         }
-        Text(text = "$playedTime:$trackTime")
+        Text(text = "${audioState.playedTime}:${audioState.endTime}")
     }
 
 }
