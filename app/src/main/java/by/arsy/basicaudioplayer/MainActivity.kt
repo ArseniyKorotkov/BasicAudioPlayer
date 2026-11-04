@@ -47,6 +47,7 @@ fun AudioPlayerExample(
 ) {
     val isRun by viewModel.isRun.collectAsState()
     val playedTime by viewModel.playedTime.collectAsState()
+    val trackTime by viewModel.trackTime.collectAsState()
     val activity = LocalActivity.current
 
     DisposableEffect(isRun) {
@@ -69,7 +70,7 @@ fun AudioPlayerExample(
                 if (isRun) {
                     viewModel.stopAudio()
                 } else {
-                    viewModel.play("https://sefon.pro/api/mp3_download/direct/1233798/3vUCADNzBWFY4RFewdV9RW9bFnX0aMyLy0yggE7VbT_gPgGHQJAAtJmVts37OUb6DiwIkNoIubA0ZE7mE8h149WEp886d9kdHE4Z9Ifao2Vgco0qNXEM35uwjcN4vFnz9RlcQqqG9mxDFVamWz_IwhZLBqHz5PgcROl-4w/")
+                    viewModel.play("https://sefon.pro/api/mp3_download/direct/473774/3vUCACkHO2N_DuccBwV3XXxWD9P2S9kWLSU022fZQMpj1INC31rq8g2K9sqP5Dx62xfZiGLemz3BrdPjwjrp0_jYCvvsHlvmqUOV84DfybNz8sqHe8BGlk1pQmpDtausjk_4W-b14mfzL0NV-NnQmwhP-eVGCt_n_iSrHvU/")
                 }
             }
         ) {
@@ -78,7 +79,7 @@ fun AudioPlayerExample(
                 fontSize = 42.sp
             )
         }
-        Text(text = "$playedTime")
+        Text(text = "$playedTime:$trackTime")
     }
 
 }
