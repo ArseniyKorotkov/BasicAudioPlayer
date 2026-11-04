@@ -11,6 +11,9 @@ import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -60,14 +63,19 @@ class AudioViewModel : ViewModel() {
 
     private fun updateCurrentPositon() {
         viewModelScope.launch {
-            while (exoPlayer?.isPlaying == true) {
-                if (!_audioState.value.isPlayedTimeChangeHandle) {
-                    exoPlayer?.currentPosition?.let {
-                        updateAudioPlayedTime(it)
+            _audioState
+                .map { it.isRun }
+                .distinctUntilChanged()
+                .collectLatest { isPlaying ->
+                    while (isPlaying) {
+                        if (!_audioState.value.isPlayedTimeChangeHandle) {
+                            exoPlayer?.currentPosition?.let {
+                                updateAudioPlayedTime(it)
+                            }
+                        }
+                        delay(duration = 200.milliseconds)
                     }
                 }
-                delay(duration = 200.milliseconds)
-            }
         }
     }
 
