@@ -74,7 +74,9 @@ fun AudioPlayerExample(
             }
         ) {
             Text(
-                text = if (audioState.isRun) "||" else ">",
+                text = if (audioState.isRun) "||" else {
+                    if (audioState.isLoad) "o" else ">"
+                },
                 fontSize = 42.sp
             )
         }

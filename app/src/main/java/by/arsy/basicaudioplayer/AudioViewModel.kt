@@ -33,6 +33,12 @@ class AudioViewModel : ViewModel() {
                     updateEndPosition()
                 }
 
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    _audioState.value = _audioState.value.copy(
+                        isLoad = playbackState == Player.STATE_BUFFERING
+                    )
+                }
+
                 override fun onPlayerError(error: PlaybackException) {
                     Log.e(LOG_TAG, "Ошибка ExoPlayer: ${error.message}", error)
                 }
