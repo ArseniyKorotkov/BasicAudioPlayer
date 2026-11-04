@@ -55,8 +55,10 @@ class AudioViewModel : ViewModel() {
     private fun updateCurrentPositon() {
         viewModelScope.launch {
             while (exoPlayer?.isPlaying == true) {
-                exoPlayer?.currentPosition?.let {
-                    _audioState.value = _audioState.value.copy(playedTime = it)
+                if (!_audioState.value.isPlayedTimeChangeHandle) {
+                    exoPlayer?.currentPosition?.let {
+                        updateAudioPlayedTime(it)
+                    }
                 }
                 delay(duration = 200.milliseconds)
             }
@@ -69,6 +71,19 @@ class AudioViewModel : ViewModel() {
 
     fun stopAudio() {
         exoPlayer?.pause()
+    }
+
+    fun updateAudioPlayedTime(time: Long) {
+        _audioState.value = _audioState.value.copy(playedTime = time)
+    }
+
+    fun startPlayedTimeChangeHandle() {
+        _audioState.value = _audioState.value.copy(isPlayedTimeChangeHandle = true)
+    }
+
+    fun endPlayedTimeChangeHandle() {
+        exoPlayer?.seekTo(_audioState.value.playedTime)
+        _audioState.value = _audioState.value.copy(isPlayedTimeChangeHandle = false)
     }
 
     companion object {
