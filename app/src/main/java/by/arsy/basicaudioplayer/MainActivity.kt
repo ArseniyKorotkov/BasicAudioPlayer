@@ -2,6 +2,7 @@ package by.arsy.basicaudioplayer
 
 import android.content.Context
 import android.os.Bundle
+import android.text.format.DateUtils.formatElapsedTime
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
@@ -91,7 +92,13 @@ fun AudioPlayerExample(
             },
             valueRange = 0f..audioState.endTime / 1000f
         )
-        Text(text = "${audioState.playedTime}:${audioState.endTime}")
+        Text(
+            text = "${audioState.playedTime.getTime()} / ${audioState.endTime.getTime()}"
+        )
     }
 
+}
+
+fun Long.getTime() : String {
+    return formatElapsedTime( /* elapsedSeconds = */ this / 1000)
 }
