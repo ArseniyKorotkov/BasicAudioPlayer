@@ -108,6 +108,7 @@ class AudioViewModel : ViewModel() {
                 textList.add(
                     TextEntity(
                         text = "text$it",
+                        translatedText = "translate$it",
                         endTime = (it + 1) * 1000L
                     )
                 )
@@ -122,6 +123,7 @@ class AudioViewModel : ViewModel() {
 
     data class TextEntity(
         val text: String,
+        val translatedText: String,
         val endTime: Long
     )
 }

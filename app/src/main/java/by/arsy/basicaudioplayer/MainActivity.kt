@@ -15,8 +15,10 @@ import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -68,6 +70,7 @@ fun AudioPlayerExample(
     val audioState by viewModel.audioState.collectAsState()
     val activity = LocalActivity.current
     val textScroll = rememberLazyListState()
+    val translateTextScroll = rememberLazyListState()
     val currentFirstItemIndex by remember(audioState.playedTime) {
         derivedStateOf {
             viewModel.text().indexOfFirst { it.endTime > audioState.playedTime }
@@ -96,6 +99,33 @@ fun AudioPlayerExample(
                     )
                 )
             } ?: textScroll.animateScrollToItem(index = currentFirstItemIndex, scrollOffset = 0)
+        }
+    }
+
+    LaunchedEffect(currentFirstItemIndex) {
+        currentFirstItemIndex.run {
+            val scrollInfo = translateTextScroll.layoutInfo
+            val currentTextView = scrollInfo.visibleItemsInfo
+                .firstOrNull { it.index == currentFirstItemIndex }
+
+            currentTextView?.run {
+                val currentText = viewModel.text()[currentTextView.index].endTime
+                val nextText = viewModel.text()
+                    .getOrNull(currentTextView.index + 1)?.endTime
+                    ?: audioState.endTime
+
+                currentTextDuration = (nextText - currentText).toInt() + 240
+                translateTextScroll.animateScrollBy(
+                    value = currentTextView.offset.toFloat(),
+                    animationSpec = TweenSpec(
+                        durationMillis = currentTextDuration,
+                        easing = LinearEasing
+                    )
+                )
+            } ?: translateTextScroll.animateScrollToItem(
+                index = currentFirstItemIndex,
+                scrollOffset = 0
+            )
         }
     }
 
@@ -162,6 +192,31 @@ fun AudioPlayerExample(
                 )
                 Text(
                     text = it.text,
+                    fontSize = 24.sp,
+                    color = animateColorAsState
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 60.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            state = translateTextScroll
+        ) {
+            items(
+                items = viewModel.text(),
+                key = { it.endTime }
+            ) {
+                val animateColorAsState by animateColorAsState(
+                    targetValue = if (viewModel.text().indexOf(it) > currentFirstItemIndex)
+                        Color.Gray else Color.White,
+                    animationSpec = TweenSpec(durationMillis = currentTextDuration)
+                )
+                Text(
+                    text = it.translatedText,
                     fontSize = 24.sp,
                     color = animateColorAsState
                 )
