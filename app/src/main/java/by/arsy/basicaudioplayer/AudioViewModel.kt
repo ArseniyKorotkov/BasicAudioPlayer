@@ -25,6 +25,8 @@ class AudioViewModel : ViewModel() {
 
     val audioState = _audioState.asStateFlow()
 
+    private val textList = mutableListOf<TextEntity>()
+
     fun initPlayer(context: Context) {
         if (exoPlayer != null) return
 
@@ -100,8 +102,26 @@ class AudioViewModel : ViewModel() {
         _audioState.value = _audioState.value.copy(isPlayedTimeChangeHandle = false)
     }
 
+    fun text(): List<TextEntity> {
+        if (textList.isEmpty()) {
+            repeat(times = 200) {
+                textList.add(
+                    TextEntity(
+                        text = "text$it",
+                        endTime = (it + 1) * 1000L
+                    )
+                )
+            }
+        }
+        return textList
+    }
+
     companion object {
         const val LOG_TAG = "playerExp"
     }
 
+    data class TextEntity(
+        val text: String,
+        val endTime: Long
+    )
 }
