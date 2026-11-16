@@ -35,14 +35,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlin.collections.getOrNull
 
 
 @Composable
 fun AudioScreen(
     context: Context,
     modifier: Modifier = Modifier,
-    viewModel: AudioViewModel = viewModel()
+    viewModel: AudioViewModel
 ) {
     val audioState by viewModel.audioState.collectAsState()
     val activity = LocalActivity.current
@@ -101,7 +101,7 @@ fun AudioScreen(
                 if (audioState.isRun) {
                     viewModel.stopAudio()
                 } else {
-                    viewModel.play("https://sefon.pro/api/mp3_download/direct/116590/3vUCAFX01eMwqAjcWYcpTtSm1FKpaYUnSZrznf3aG1o_fio6BVdq7Jx32RkGNjNmsn1MROhDO1klWf_yZfg5tr3TvDWI47Qe9SAIB4M3glF4eh3nDZCV9pxQz68cw5mF2PHbqzf1c9Y2famljZS-YZTfr-6DlvQfVUo6Ns4/")
+                    viewModel.play()
                 }
             }
         ) {
@@ -185,7 +185,7 @@ private fun Long.getTime(): String {
 private suspend fun driveTextScroll(
     listState: LazyListState,
     currentFirstItemIndex: Int,
-    text: List<AudioViewModel.TextEntity>,
+    text: List<HistoryStorage.TextEntity>,
     currentEndTime: Long,
     changeCurrentTextDuration: (Int) -> Unit,
     currentTextDuration: Int,

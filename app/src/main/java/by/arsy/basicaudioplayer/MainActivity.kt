@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import by.arsy.basicaudioplayer.ui.theme.BasicAudioPlayerTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,7 +22,12 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AudioScreen(
                         context = applicationContext,
-                        modifier = Modifier.padding(paddingValues = innerPadding)
+                        modifier = Modifier.padding(paddingValues = innerPadding),
+                        viewModel = viewModel(factory = viewModelFactory {
+                            initializer {
+                                AudioViewModel(historyStorage = HistoryStorage())
+                            }
+                        })
                     )
                 }
             }

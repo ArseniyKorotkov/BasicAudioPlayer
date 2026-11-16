@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
-class AudioViewModel : ViewModel() {
+class AudioViewModel(val historyStorage: HistoryStorage) : ViewModel() {
 
     private var exoPlayer: ExoPlayer? = null
 
@@ -25,7 +25,7 @@ class AudioViewModel : ViewModel() {
 
     val audioState = _audioState.asStateFlow()
 
-    private val textList = mutableListOf<TextEntity>()
+    private val _currentHistory = MutableStateFlow(value = historyStorage.defaultHistory())
 
     fun initPlayer(context: Context) {
         if (exoPlayer != null) return
@@ -52,10 +52,10 @@ class AudioViewModel : ViewModel() {
         }
     }
 
-    fun play(uri: String) {
+    fun play() {
         exoPlayer?.run {
             if (mediaItemCount == 0) {
-                val audioItem = MediaItem.fromUri(uri)
+                val audioItem = MediaItem.fromUri(_currentHistory.value.audioLink)
                 setMediaItem(audioItem)
                 prepare()
             }
@@ -102,28 +102,11 @@ class AudioViewModel : ViewModel() {
         _audioState.value = _audioState.value.copy(isPlayedTimeChangeHandle = false)
     }
 
-    fun text(): List<TextEntity> {
-        if (textList.isEmpty()) {
-            repeat(times = 200) {
-                textList.add(
-                    TextEntity(
-                        text = "text$it",
-                        translatedText = "translate$it",
-                        endTime = (it + 1) * 1000L
-                    )
-                )
-            }
-        }
-        return textList
+    fun text(): List<HistoryStorage.TextEntity> {
+        return _currentHistory.value.text
     }
 
     companion object {
         const val LOG_TAG = "playerExp"
     }
-
-    data class TextEntity(
-        val text: String,
-        val translatedText: String,
-        val endTime: Long
-    )
 }
